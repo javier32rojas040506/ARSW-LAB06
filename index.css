@@ -1,0 +1,111 @@
+body{
+    margin: 0 20px 0 20px;
+    color: rgb(82, 82, 82);
+    font-weight: 800;
+}
+
+.main_container{
+    display: grid;
+    grid-template-rows: 1fr 6fr;
+}
+
+.firstcontainer{
+    display: grid;
+    justify-items: self-start;
+    grid-template-rows: 1fr 1fr;
+    align-items: center;
+}
+
+.firstcontainer h2, div, button{
+    margin-top: 0;
+    margin-bottom: 0;
+}
+.firstcontainer button{
+    justify-self: center;
+    padding: 3px 30px 3px 30px;
+}
+
+.form{
+    display: flex;
+    flex-direction: row;
+    justify-content: flex-start;
+    gap: 50px;
+}
+.form button, input, span{
+    padding: 5px;
+}
+.form input{
+    padding: 5px 25px 5px 25px;
+    font-weight: 500;
+    color: rgb(92, 92, 92);
+    background-color: white;
+    border-radius: 5px;
+}
+.form button{
+    padding: 5px 25px 5px 25px;
+    font-weight: 600;
+    color: rgb(92, 92, 92);
+    background-color: white;
+    border-radius: 5px;
+    border: 0.5px solid rgb(181, 181, 181);
+}
+.secondcontainer{
+    display: grid;
+    grid-template-columns: 1fr 2fr;
+}
+
+.secondcontainer .bp_container{
+    width: 400px;
+    display: grid;
+    grid-template-rows: 1fr 1fr 7fr 1fr;
+}
+
+.secondcontainer #createbp{
+    border-color: rgb(204, 204, 204);
+    border-width: 6px;
+    border-style: solid;
+    border-radius: 5px;
+    background-color: rgb(235, 106, 131);
+    color: rgb(102, 88, 90);
+    font-weight: 800;
+    align-self: center;
+    justify-self: self-start;
+    padding: 3px 30px 3px 30px;
+
+}
+
+.secondcontainer .bp_container h3{
+    font-weight: 900;
+    color: rgb(92, 92, 92);
+    margin: 0;
+}
+
+.secondcontainer .bp_container .btn-options-bp{
+    display: flex;
+    justify-content: space-evenly;
+}
+
+.secondcontainer .bp_container .btn-options-bp button:nth-child(1){
+    height: 30px;
+    padding: 2px 30px 2px 30px;
+    background-color: rgb(145, 195, 33);
+    color: rgb(82, 82, 82);
+    font-weight: 800;
+    border: 1px solid transparent;
+    border-radius: 3px;
+    margin: 1em;
+}
+
+.secondcontainer .bp_container .btn-options-bp button:nth-child(2){
+    height: 30px;
+    padding: 2px 20px 2px 20px;
+    background-color: rgb(254, 45, 132);
+    color: rgb(82, 82, 82);
+    font-weight: 800;
+    border: 1px solid transparent;
+    border-radius: 3px;
+    margin: 1em;
+
+}
+
+
