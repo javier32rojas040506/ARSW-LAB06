@@ -29,7 +29,7 @@ var app=(function(){
           save_update_btn.onclick = () => {
             let URL_API_fetch = URL_API;
             let authorName = document.getElementById("search_author").value;
-            list_blueprints(URL_API_fetch, authorName, authorName);          
+            list_blueprints(URL_API_fetch, authorName, context);          
           };
 
         }
@@ -47,7 +47,7 @@ var app=(function(){
   })(); 
 
 //Build a table
-const buildTable = (blueprints) => {
+const buildTable = (blueprints, context) => {
   document.getElementById('bp_table').innerHTML = ""
   console.log(blueprints);
   let table = document.createElement('table');
@@ -82,6 +82,7 @@ const buildTable = (blueprints) => {
     let row_2_data_3 = document.createElement('td');
     let row_2_button = document.createElement('button');
     row_2_button.innerHTML = "Open";
+    row_2_button.onclick = () => {drawBlueprint(bp.points, context)};
     row_2_data_3.appendChild(row_2_button);
 
     row_2.appendChild(row_2_data_1);
@@ -97,13 +98,13 @@ const buildTable = (blueprints) => {
 };
 
 //list blueprints
-const list_blueprints = (URL_API_fetch, authorName) => {
+const list_blueprints = (URL_API_fetch, authorName, context) => {
   if(authorName){
     URL_API_fetch = `${URL_API_fetch}/${authorName}`
   }
   fetch(URL_API_fetch, {mode:'cors'})
     .then(response => response.json())
-    .then(data => buildTable(data))
+    .then(data => buildTable(data, context))
     .catch(error => {
       alert("Autor no encontrado");
     });
@@ -121,7 +122,6 @@ const list_blueprints = (URL_API_fetch, authorName) => {
   const drawPoint = (ponitX, ponitY, context) => {
     //save the points of bluePrint
     canvasPoints.push({"x":ponitX, "y":ponitY});
-    console.log(canvasPoints);
     //draw a Point
     context.beginPath();
     context.strokeStyle = "blue";
@@ -131,6 +131,23 @@ const list_blueprints = (URL_API_fetch, authorName) => {
     context.arc(ponitX , ponitY , 1.8, 0, Math.PI * 2, true); 
     context.fill();
     context.stroke();
+  };
+
+  const drawBlueprint = (points, context) => {
+    cleanCanvas();
+    for (let i = 0; i < points.length; i++) {
+      console.log(points[i]);
+      if(i < points.length - 1) {
+        drawLine(points[i].x, points[i].y, points[i + 1].x, points[i + 1].y, context);
+      }
+      drawLine(points[i].x, points[i].y, points[i].x, points[i].y, context);
+    }
+  };
+
+  const cleanCanvas = () => {
+    let canvas = document.getElementById('mycanvas');
+    let context = canvas.getContext('2d');
+    context.clearRect(0, 0, canvas.width, canvas.height);
   };
 
 
