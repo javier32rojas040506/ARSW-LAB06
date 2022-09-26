@@ -108,4 +108,14 @@ body{
 
 }
 
+#bp_table{
+    border-collapse: collapse;
+    border-spacing: 0;
+    margin-right: 20px;
+}
+#bp_table th, td{
+    padding: 10px 20px;
+    border: 2px solid rgb(146, 146, 146)
+}
+
 
