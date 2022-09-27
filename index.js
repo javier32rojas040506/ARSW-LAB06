@@ -1,12 +1,12 @@
-const canvasPoints = [];
-
 var app=(function(){
     const URL_API = "http://localhost:8080/blueprints";
   
     //private variables
     var canvas = document.getElementById("mycanvas"), 
         context = canvas.getContext("2d");
-    let save_update_btn = document.getElementById("get_blueprint_btn");
+    let get_blueprint_btn = document.getElementById("get_blueprint_btn");
+
+    let canvasPoints = [];
     
     //returns an object with 'public' functions:
     return {
@@ -19,17 +19,19 @@ var app=(function(){
           canvas.addEventListener("pointerdown", function(event){
             x0 = event.pageX - event.target.offsetLeft;
             y0 = event.pageY - event.target.offsetTop;
-            drawPoint(x0, y0, context);
+            drawPoint(x0, y0, context, canvasPoints);
+            console.log(canvasPoints);
           });
           canvas.addEventListener("pointerup", (event) => {
             xf = event.pageX - event.target.offsetLeft;
             yf = event.pageY - event.target.offsetTop;
-            drawLine(x0, y0, xf, yf,  context);
+            drawLine(x0, y0, xf, yf,  context, canvasPoints);
           });
-          save_update_btn.onclick = () => {
+          get_blueprint_btn.onclick = () => {
             let URL_API_fetch = URL_API;
-            let authorName = document.getElementById("search_author").value;
-            list_blueprints(URL_API_fetch, authorName, context);          
+            currentAuthor = document.getElementById("search_author").value;
+            document.querySelector(".table_points h2").innerHTML = `${currentAuthor} blueprints:`;
+            list_blueprints(URL_API_fetch, currentAuthor, context, canvasPoints);          
           };
 
         }
@@ -37,7 +39,7 @@ var app=(function(){
           canvas.addEventListener("mousedown", function(event){
             x0 = event.pageX - event.target.offsetLeft;
             y0 = event.pageY - event.target.offsetTop;
-              drawPoint(x0, y0, context);
+              drawPoint(x0, y0, context, canvasPoints);
             }
           );
         }
@@ -47,9 +49,10 @@ var app=(function(){
   })(); 
 
 //Build a table
-const buildTable = (blueprints, context) => {
-  document.getElementById('bp_table').innerHTML = ""
-  console.log(blueprints);
+const buildTable = (blueprints, context, canvasPoints) => {
+  document.getElementById('bp_table').innerHTML = "";
+  console.log("Blueprints",blueprints);
+  console.log("canvasPoints", canvasPoints);
   let table = document.createElement('table');
   let thead = document.createElement('thead');
   let tbody = document.createElement('tbody');
@@ -82,8 +85,22 @@ const buildTable = (blueprints, context) => {
     let row_2_data_3 = document.createElement('td');
     let row_2_button = document.createElement('button');
     row_2_button.innerHTML = "Open";
-    row_2_button.onclick = () => {drawBlueprint(bp.points, context)};
+
+
+    row_2_button.onclick = () => {
+      drawBlueprint(bp.points, context, canvasPoints);
+      document.querySelector('.bp_container h3').innerHTML = `Current blueprint: ${bp.name}`;
+      let save_update_btn = document.getElementById("save_update_btn");
+      save_update_btn.onclick = () => {
+        let URL_API_fetch = `http://localhost:8080/blueprints/${bp.author}/${bp.name}`;
+        save_update_blueprints(URL_API_fetch, canvasPoints, bp.author, bp.name);
+        currentAuthor = document.getElementById("search_author").value;
+        URL_API_fetch = `http://localhost:8080/blueprints/`;
+        list_blueprints(URL_API_fetch, currentAuthor, context, canvasPoints);
+      };
+    };
     row_2_data_3.appendChild(row_2_button);
+
 
     row_2.appendChild(row_2_data_1);
     row_2.appendChild(row_2_data_2);
@@ -98,30 +115,49 @@ const buildTable = (blueprints, context) => {
 };
 
 //list blueprints
-const list_blueprints = (URL_API_fetch, authorName, context) => {
+const list_blueprints = (URL_API_fetch, authorName, context, canvasPoints) => {
   if(authorName){
     URL_API_fetch = `${URL_API_fetch}/${authorName}`
   }
   fetch(URL_API_fetch, {mode:'cors'})
     .then(response => response.json())
-    .then(data => buildTable(data, context))
+    .then(data => buildTable(data, context, canvasPoints))
     .catch(error => {
       alert("Autor no encontrado");
     });
 };
-//Functions for draw  
-  const drawLine = (x0, y0, x1, y1, context) => {
+// save update blueprints
+const save_update_blueprints = (URL_API_fetch, canvasPoints, currentAuthor, currentBlueprintName) => {
+  console.log(URL_API_fetch, currentAuthor);
+  dataToPut = {
+    "author": currentAuthor,
+    "points": canvasPoints,
+    "name": currentBlueprintName
+  }
+  console.log(dataToPut);
+
+  fetch(URL_API_fetch, { method:'PUT', mode:'cors', body: JSON.stringify(dataToPut)})
+  .then( response => response)
+  .catch( error => {
+    console.log(error);
+    alert("No se puede guardar el blueprint");
+    }  
+  );
+};
+
+//Functions for draw in canvas
+  const drawLine = (x0, y0, x1, y1, context, canvasPoints) => {
     context.beginPath();
     context.strokeStyle = "blue";
     context.moveTo(x0, y0);
     context.lineTo(x1, y1);
     context.stroke();
-    drawPoint(x1, y1, context);
+    drawPoint(x1, y1, context, canvasPoints);
   }
 
-  const drawPoint = (ponitX, ponitY, context) => {
+  const drawPoint = (ponitX, ponitY, context, canvasPoints) => {
     //save the points of bluePrint
-    canvasPoints.push({"x":ponitX, "y":ponitY});
+    canvasPoints.push({"x":Math.floor(ponitX), "y":Math.floor(ponitY)});
     //draw a Point
     context.beginPath();
     context.strokeStyle = "blue";
@@ -134,21 +170,27 @@ const list_blueprints = (URL_API_fetch, authorName, context) => {
   };
 
   const drawBlueprint = (points, context) => {
-    cleanCanvas();
+    canvasPoints =  cleanCanvas();
+    console.log(canvasPoints);
     for (let i = 0; i < points.length; i++) {
-      console.log(points[i]);
       if(i < points.length - 1) {
-        drawLine(points[i].x, points[i].y, points[i + 1].x, points[i + 1].y, context);
+        drawLine(points[i].x, points[i].y, points[i + 1].x, points[i + 1].y, context, canvasPoints);
       }
-      drawLine(points[i].x, points[i].y, points[i].x, points[i].y, context);
+      drawLine(points[i].x, points[i].y, points[i].x, points[i].y, context, canvasPoints);
     }
   };
 
   const cleanCanvas = () => {
+    canvasPoints = [];
+    currentBlueprintName = null;
+    currentAuthor = null;
     let canvas = document.getElementById('mycanvas');
     let context = canvas.getContext('2d');
     context.clearRect(0, 0, canvas.width, canvas.height);
+    return canvasPoints
   };
+
+
 
 
 
