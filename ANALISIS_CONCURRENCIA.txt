@@ -1,0 +1,10 @@
+¿Qué condiciones de carrera se podrían presentar?
+Cuando se haga un post o un put y se haga un get la información que se reciba va a depender del origen.
+Dos puts al tiempo pondrían generar conflicto entre la información deseada.
+
+¿Cuáles son las respectivas regiones críticas?
+Sol1: El HashMap blueprints, ya que es nuestro acceso a persistencia, cualquier operación de agregar o leer debe ser declarada
+como sección crítica.
+Sol2: Se puede hacer lecturas sobre los datos, realmente no importa, depende de la aplicación que esté sirviendo la API,
+pues se puede hacer lo que se denomina una lectura sucia, sin embargo los métodos put y post de la implementación de
+BlueprintsPersistence deben ser síncronos para que no existan problemas ni inconsistencias en los datos guardados.
