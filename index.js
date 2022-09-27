@@ -48,6 +48,20 @@ var app=(function(){
     
   })(); 
 
+
+//list blueprints
+const list_blueprints = (URL_API_fetch, authorName, context, canvasPoints) => {
+  if(authorName){
+    URL_API_fetch = `${URL_API_fetch}/${authorName}`
+  }
+  fetch(URL_API_fetch, {mode:'cors'})
+    .then(response => response.json())
+    .then(data => buildTable(data, context, canvasPoints))
+    .catch(error => {
+      alert("Autor no encontrado");
+    });
+};
+
 //Build a table
 const buildTable = (blueprints, context, canvasPoints) => {
   document.getElementById('bp_table').innerHTML = "";
@@ -116,18 +130,6 @@ const buildTable = (blueprints, context, canvasPoints) => {
 
 };
 
-//list blueprints
-const list_blueprints = (URL_API_fetch, authorName, context, canvasPoints) => {
-  if(authorName){
-    URL_API_fetch = `${URL_API_fetch}/${authorName}`
-  }
-  fetch(URL_API_fetch, {mode:'cors'})
-    .then(response => response.json())
-    .then(data => buildTable(data, context, canvasPoints))
-    .catch(error => {
-      alert("Autor no encontrado");
-    });
-};
 // save update blueprints
 const save_update_blueprints = (URL_API_fetch, canvasPoints, currentAuthor, currentBlueprintName) => {
   console.log(URL_API_fetch, currentAuthor);
@@ -146,6 +148,7 @@ const save_update_blueprints = (URL_API_fetch, canvasPoints, currentAuthor, curr
     }  
   );
 };
+
 
 //Functions for draw in canvas
   const drawLine = (x0, y0, x1, y1, context, canvasPoints) => {
