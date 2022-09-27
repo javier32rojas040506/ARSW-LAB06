@@ -88,7 +88,9 @@ const buildTable = (blueprints, context, canvasPoints) => {
 
 
     row_2_button.onclick = () => {
+      console.log(canvasPoints);
       drawBlueprint(bp.points, context, canvasPoints);
+      console.log(canvasPoints);
       document.querySelector('.bp_container h3').innerHTML = `Current blueprint: ${bp.name}`;
       let save_update_btn = document.getElementById("save_update_btn");
       save_update_btn.onclick = () => {
@@ -169,8 +171,9 @@ const save_update_blueprints = (URL_API_fetch, canvasPoints, currentAuthor, curr
     context.stroke();
   };
 
-  const drawBlueprint = (points, context) => {
-    canvasPoints =  cleanCanvas();
+  const drawBlueprint = (points, context, canvasPoints) => {
+    console.log(canvasPoints);
+    canvasPoints =  cleanCanvas(canvasPoints);
     console.log(canvasPoints);
     for (let i = 0; i < points.length; i++) {
       if(i < points.length - 1) {
@@ -180,7 +183,7 @@ const save_update_blueprints = (URL_API_fetch, canvasPoints, currentAuthor, curr
     }
   };
 
-  const cleanCanvas = () => {
+  const cleanCanvas = (canvasPoints) => {
     canvasPoints = [];
     currentBlueprintName = null;
     currentAuthor = null;
