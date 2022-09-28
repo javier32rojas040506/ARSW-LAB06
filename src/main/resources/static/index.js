@@ -1,3 +1,5 @@
+let canvasPoints = [];
+
 var app=(function(){
     const URL_API = "http://localhost:8080/blueprints";
   
@@ -5,8 +7,6 @@ var app=(function(){
     var canvas = document.getElementById("mycanvas"), 
         context = canvas.getContext("2d");
     let get_blueprint_btn = document.getElementById("get_blueprint_btn");
-
-    let canvasPoints = [];
     
     //returns an object with 'public' functions:
     return {
@@ -25,7 +25,7 @@ var app=(function(){
           canvas.addEventListener("pointerup", (event) => {
             xf = event.pageX - event.target.offsetLeft;
             yf = event.pageY - event.target.offsetTop;
-            drawLine(x0, y0, xf, yf,  context, canvasPoints);
+            drawLine(x0, y0, xf, yf,  context);
           });
           get_blueprint_btn.onclick = () => {
             let URL_API_fetch = URL_API;
@@ -107,6 +107,7 @@ const buildTable = (blueprints, context, canvasPoints) => {
       let save_update_btn = document.getElementById("save_update_btn"); 
       save_update_btn.onclick = () => {
         let URL_API_fetch = `http://localhost:8080/blueprints/${bp.author}/${bp.name}`;
+        console.log("Points", canvasPoints);
         save_update_blueprints(URL_API_fetch, canvasPoints, bp.author, bp.name);
         currentAuthor = document.getElementById("search_author").value;
         URL_API_fetch = `http://localhost:8080/blueprints/`;
@@ -149,7 +150,7 @@ const save_update_blueprints = (URL_API_fetch, canvasPoints, currentAuthor, curr
 
 
 //Functions for draw in canvas
-  const drawLine = (x0, y0, x1, y1, context, canvasPoints) => {
+  const drawLine = (x0, y0, x1, y1, context) => {
     context.beginPath();
     context.strokeStyle = "blue";
     context.moveTo(x0, y0);
@@ -158,7 +159,7 @@ const save_update_blueprints = (URL_API_fetch, canvasPoints, currentAuthor, curr
     drawPoint(x1, y1, context, canvasPoints);
   }
 
-  const drawPoint = (ponitX, ponitY, context, canvasPoints) => {
+  const drawPoint = (ponitX, ponitY, context) => {
     //save the points of bluePrint
     canvasPoints.push({"x":Math.floor(ponitX), "y":Math.floor(ponitY)});
     //draw a Point
@@ -172,13 +173,13 @@ const save_update_blueprints = (URL_API_fetch, canvasPoints, currentAuthor, curr
     context.stroke();
   };
 
-  const drawBlueprint = (points, context, canvasPoints) => {
+  const drawBlueprint = (points, context) => {
     canvasPoints = cleanCanvas();
-    for (let i = 0; i < points.length; i++) {
-      if(i < points.length - 1) {
+    for (let i = 0; i < points.length; i = +2) {
+      if(i <= points.length - 2) {
         drawLine(points[i].x, points[i].y, points[i + 1].x, points[i + 1].y, context, canvasPoints);
+        drawPoint(points[i + 1].x, points[i + 1].y, context);
       }
-      drawLine(points[i].x, points[i].y, points[i].x, points[i].y, context, canvasPoints);
     }
     return canvasPoints;
   };
