@@ -143,4 +143,14 @@ public class BlueprintsServices {
     public void putBlueprint(String author, String bpname ,Blueprint bp) throws BlueprintPersistenceException {
         bpp.putBlueprint(author, bpname, bp);
     }
+
+    /**
+     * Method that delete a given blueprint
+     * @param author blueprint's author
+     * @param bpname blueprint's name
+     * @throws BlueprintPersistenceException if the blueprint doesn't exists
+     */
+    public void deleteBlueprint(String author, String bpname) throws BlueprintPersistenceException {
+        bpp.deleteBlueprint(author, bpname);
+    }
 }
