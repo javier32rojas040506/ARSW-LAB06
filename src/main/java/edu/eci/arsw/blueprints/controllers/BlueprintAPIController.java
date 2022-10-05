@@ -90,4 +90,15 @@ public class BlueprintAPIController {
             return new ResponseEntity<>("Error this blueprint doesn't exists",HttpStatus.FORBIDDEN);
         }
     }
+
+    @RequestMapping(method = RequestMethod.DELETE, path = "/{author}/{bpname}")
+    public ResponseEntity<?> deleteBlueprint(@PathVariable String author, @PathVariable String bpname){
+        try {
+            bps.deleteBlueprint(author, bpname);
+            return new ResponseEntity<>(HttpStatus.CREATED);
+        } catch (BlueprintPersistenceException ex) {
+            Logger.getLogger(BlueprintAPIController.class.getName()).log(Level.SEVERE, null, ex);
+            return new ResponseEntity<>("Error this blueprint doesn't exists",HttpStatus.FORBIDDEN);
+        }
+    }
 }

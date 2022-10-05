@@ -27,8 +27,7 @@ public class InMemoryBlueprintPersistence implements BlueprintsPersistence {
     public InMemoryBlueprintPersistence() {
         //load stub data
         Point[] pts=new Point[]{new Point(140, 140),new Point(115, 115)};
-        Point[] pts1=new Point[]{new Point(0, 0),new Point(10, 10), new Point(10, 10),
-                new Point(11, 10), new Point(15, 10), new Point(15, 10), new Point(0,0)};
+        Point[] pts1=new Point[]{new Point(0, 0),new Point(10, 11)};
         Blueprint bp=new Blueprint("_authorname_", "_bpname_",pts);
         Blueprint bp1=new Blueprint("pedro","casa38", pts1);
         Blueprint bp2=new Blueprint("juan","casa39", pts1);
@@ -105,5 +104,20 @@ public class InMemoryBlueprintPersistence implements BlueprintsPersistence {
             }
         }
     }
+
+    @Override
+    public void deleteBlueprint(String author, String bpname) throws  BlueprintPersistenceException {
+        if (!blueprints.containsKey(new Tuple<>(author,bpname))) throw new BlueprintPersistenceException("This object doesn't exists");
+        else
+        {
+            blueprints.remove(new Tuple<>(author,bpname));
+            try {
+                Thread.sleep(0);
+            } catch (InterruptedException e) {
+                throw new RuntimeException(e);
+            }
+        }
+    }
+
 
 }

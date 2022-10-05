@@ -2,6 +2,7 @@ let canvasPoints = [];
 
 var app=(function(){
     const URL_API = "http://localhost:8080/blueprints";
+    addListeners();
   
     //private variables
     var canvas = document.getElementById("mycanvas"), 
@@ -19,7 +20,6 @@ var app=(function(){
           canvas.addEventListener("pointerdown", function(event){
             x0 = event.pageX - event.target.offsetLeft;
             y0 = event.pageY - event.target.offsetTop;
-            debugger
             drawPoint(x0, y0, context, canvasPoints);
           });
           canvas.addEventListener("pointerup", (event) => {
@@ -65,7 +65,6 @@ const list_blueprints = (URL_API_fetch, authorName, context, canvasPoints) => {
 //Build a table
 const buildTable = (blueprints, context, canvasPoints) => {
   document.getElementById('bp_table').innerHTML = "";
-  console.log("Blueprints",blueprints);
   let table = document.createElement('table');
   let thead = document.createElement('thead');
   let tbody = document.createElement('tbody');
@@ -102,16 +101,14 @@ const buildTable = (blueprints, context, canvasPoints) => {
     //button functions
     row_2_button.onclick = () => {
       canvasPoints = drawBlueprint(bp.points, context, canvasPoints);
-      debugger
       document.querySelector('.bp_container h3').innerHTML = `Current blueprint: ${bp.name}`;
+      document.getElementById("delete_btn").onclick = () => {
+          deleteBlueprint(bp.author, bp.name);
+      }
       let save_update_btn = document.getElementById("save_update_btn"); 
       save_update_btn.onclick = () => {
         let URL_API_fetch = `http://localhost:8080/blueprints/${bp.author}/${bp.name}`;
-        console.log("Points", canvasPoints);
-        save_update_blueprints(URL_API_fetch, canvasPoints, bp.author, bp.name);
-        currentAuthor = document.getElementById("search_author").value;
-        URL_API_fetch = `http://localhost:8080/blueprints/`;
-        list_blueprints(URL_API_fetch, currentAuthor, context, canvasPoints);
+        save_update_blueprints(URL_API_fetch, canvasPoints, bp.author, bp.name, context);
       };
     };
     row_2_data_3.appendChild(row_2_button);
@@ -124,28 +121,26 @@ const buildTable = (blueprints, context, canvasPoints) => {
   })
   score = document.getElementById("score");
   score.innerHTML = "Total user points: " + userTotalpoints;
-
-
-
 };
 
 // save update blueprints
-const save_update_blueprints = (URL_API_fetch, canvasPoints, currentAuthor, currentBlueprintName) => {
-  console.log(URL_API_fetch, currentAuthor);
-  dataToPut = {
-    "author": currentAuthor,
-    "points": canvasPoints,
-    "name": currentBlueprintName
-  }
-  console.log(dataToPut);
-
-  fetch(URL_API_fetch, { method:'PUT', mode:'cors', body: JSON.stringify(dataToPut)})
-  .then( response => response)
-  .catch( error => {
-    console.log(error);
-    alert("No se puede guardar el blueprint");
-    }  
-  );
+const save_update_blueprints = (URL_API_fetch, canvasPoints, currentAuthor, currentBlueprintName, context) => {
+          dataToPut = {
+                    "author": currentAuthor,
+                    "points": canvasPoints,
+                    "name": currentBlueprintName
+          }
+          fetch(URL_API_fetch, { method:'PUT', mode:'cors', body: JSON.stringify(dataToPut)})
+          .then( response => {
+                    currentAuthor = document.getElementById("search_author").value;
+                    URL_API_fetch = `http://localhost:8080/blueprints/`;
+                    list_blueprints(URL_API_fetch, currentAuthor, context, canvasPoints);
+          })
+          .catch( error => {
+                    console.log(error);
+                    alert("No se puede actualizar el blueprint");
+          }  
+          );
 };
 
 
@@ -156,7 +151,7 @@ const save_update_blueprints = (URL_API_fetch, canvasPoints, currentAuthor, curr
     context.moveTo(x0, y0);
     context.lineTo(x1, y1);
     context.stroke();
-    drawPoint(x1, y1, context, canvasPoints);
+    drawPoint(x1, y1, context);
   }
 
   const drawPoint = (ponitX, ponitY, context) => {
@@ -175,10 +170,10 @@ const save_update_blueprints = (URL_API_fetch, canvasPoints, currentAuthor, curr
 
   const drawBlueprint = (points, context) => {
     canvasPoints = cleanCanvas();
-    for (let i = 0; i < points.length; i = +2) {
+    for (let i = 0; i < points.length; i = i+2) {
       if(i <= points.length - 2) {
         drawLine(points[i].x, points[i].y, points[i + 1].x, points[i + 1].y, context, canvasPoints);
-        drawPoint(points[i + 1].x, points[i + 1].y, context);
+        drawPoint(points[i].x, points[i].y, context);
       }
     }
     return canvasPoints;
@@ -191,11 +186,70 @@ const save_update_blueprints = (URL_API_fetch, canvasPoints, currentAuthor, curr
     let canvas = document.getElementById('mycanvas');
     let context = canvas.getContext('2d');
     context.clearRect(0, 0, canvas.width, canvas.height);
-    return canvasPoints
-  };
+    return canvasPoints;
+  }; 
 
+ function addListeners () {
+          let createButton = document.getElementById("createbp");
 
+          createButton.onclick = () => {
+                    createBlueprint();
+          }
+ }
 
+ function deleteBlueprint(author, name) {
+          let URL_API_fetch = `http://localhost:8080/blueprints/${author}/${name}`;
+          let canvas = document.getElementById('mycanvas');
+          let context = canvas.getContext('2d');
+          fetch(URL_API_fetch, { method:'DELETE', mode:'cors'})
+          .then( response => {
+                    let URL_API_fetch = `http://localhost:8080/blueprints/`;
+                    canvasPoints = cleanCanvas();
+                    currentAuthor = document.getElementById("search_author").value;
+                    list_blueprints(URL_API_fetch, "", context, canvasPoints);
+          })
+          .catch( error => {
+                    alert("No se puede guardar el blueprint");
+          }  
+          );
+ }
 
+ function createBlueprint() {
+          canvasPoints = cleanCanvas();
+          const author = prompt("Ingresa el nombre del autor");
+          const name = prompt("Ingresa el nombre del Blueprint");
+          document.getElementById("delete_btn").onclick = () => {
+                    deleteBlueprint(author, name);
+          }
+          let canvas = document.getElementById('mycanvas');
+          let context = canvas.getContext('2d');
+          document.querySelector('.bp_container h3').innerHTML = `Current blueprint: ${name}`;
+          let save_update_btn = document.getElementById("save_update_btn"); 
+          save_update_btn.onclick = () => {
+                    let URL_API_fetch = `http://localhost:8080/blueprints/`;
+                    dataToPut = {
+                              "author": author,
+                              "points": canvasPoints,
+                              "name": name
+                    }
+                    fetch(URL_API_fetch, { method:'POST', mode:'cors', body: JSON.stringify(dataToPut)})
+                    .then( response => {
+                              updateEvent(author, canvasPoints, name, context);
+                              currentAuthor = document.getElementById("search_author").value;
+                              list_blueprints(URL_API_fetch, currentAuthor, context, canvasPoints);
+                     })
+                    .catch( error => {
 
-  
+                              console.log(error);
+                              alert("No se puede guardar el blueprint");
+                    }
+                    );
+          };
+ }
+
+ function updateEvent(author, canvasPoints, name, context) {
+          document.getElementById("save_update_btn").onclick = () => {
+                    let URL_API_fetch = `http://localhost:8080/blueprints/${author}/${name}`;
+                    save_update_blueprints(URL_API_fetch, canvasPoints, author, name, context);
+          };
+ }

@@ -63,4 +63,12 @@ public interface BlueprintsPersistence {
      * @throws BlueprintPersistenceException if the blueprint doesn't exists
      */
     public void putBlueprint(String author, String bpname ,Blueprint bp) throws BlueprintPersistenceException;
+
+    /**
+     * Method that delete a given blueprint
+     * @param author blueprint's author
+     * @param bpname blueprint's name
+     * @throws BlueprintPersistenceException if the blueprint doesn't exists
+     */
+    public void deleteBlueprint(String author, String bpname) throws BlueprintPersistenceException;
 }
